@@ -1,0 +1,33 @@
+<h1 class="text-center mt-5 fw-bold">User Detail</h1>
+{{#if user}}
+<div class="container mt-3">
+  <form action="/user/detail?_method=PUT" method="post">
+    <div class="mb-3">
+      <label for="firstName" class="form-label fw-bold">User Name:</label>
+      <input type="text" name="firstName" class="form-control" id="firstName" aria-label="Username" placeholder="User Name" value="{{user.firstName}}" required>
+    </div>
+    <div class="mb-3">
+      <label for="email" class="form-label fw-bold">Email address:</label>
+      <input type="email" name="email" class="form-control" id="email" aria-describedby="emailHelp" placeholder="Email" value="{{user.email}}" disabled>
+      <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+    </div>
+    <div class="mb-3">
+      <label for="password" class="form-label fw-bold">Password:</label>
+      <input type="password" name="password" class="form-control" id="password" placeholder="Password" value="{{user.password}}" required>
+      <i class="fa-solid fa-eye-slash"></i>
+    </div>
+    <button type="submit" class="btn btn-success">Save Change</button>
+  </form>
+</div>
+{{else}}
+<div class="container mt-3">
+  <h3 class="text-center fw-bold">
+    Couldn't recognize the user!
+  </h3>
+  <h5 class="text-center mt-3">
+    <a href="/user/login">Member login!</a>
+    <span> or </span>
+    <a href="/user/register">Not a member yet?</a>
+  </h5>
+</div>
+{{/if}}
