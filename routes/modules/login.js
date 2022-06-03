@@ -5,7 +5,8 @@ const User = require('../../models/user')
 
 // home page after login
 router.get('/', (req, res) => {
-  return User.findOne({email: app.locals.email})
+  const email = req.signedCookies.email || '--'
+  return User.findOne({email})
     .lean()
     .then(user => res.render('index', {user}))
     .catch(error => console.log(error))
@@ -21,15 +22,15 @@ router.post('/login', (req, res) => {
     })
     .lean()
     .then(user => {
-      if (!user) return res.redirect('/user/register')
-      app.locals.email = user.email
+      if (!user) return res.redirect('/user/detail')
+      res.cookie('email', user.email, {path: '/user', signed: true, maxAge: 60000})
       res.redirect('/user')
     })
     .catch(error => console.log(error))
 })
 // user logout
 router.post('/logout', (req, res) => {
-  app.locals.email = '--'
+  res.clearCookie('email', {path: '/user'})
   res.redirect('/')
 })
 // register
@@ -38,18 +39,19 @@ router.get('/register', (req, res) => {
 })
 router.post('/register', (req, res) => {
   const newUser = req.body
-  return User.findOne({email: app.locals.email})
+  return User.findOne({email: newUser.email})
     .then(user => {
-      if (user) return res.render('register', {user})
+      if (user) return res.render('register', {user: newUser})
       User.create(newUser)
-      app.locals.email = newUser.email
+      res.cookie('email', newUser.email, {path: '/user', signed: true, maxAge: 60000})
       res.redirect('/user')
     })
     .catch(error => console.log(error))
 })
 // read user detail
 router.get('/detail', (req, res) => {
-  return User.findOne({email: app.locals.email})
+  const email = req.signedCookies.email || '--'
+  return User.findOne({email})
     .lean()
     .then(user => res.render('userdetail', {user}))
     .catch(error => console.log(error))
@@ -57,7 +59,8 @@ router.get('/detail', (req, res) => {
 // edit the user detail
 router.put('/detail', (req, res) => {
   const {firstName, password} = req.body
-  return User.findOne({email: app.locals.email})
+  const email = req.signedCookies.email || '--'
+  return User.findOne({email})
     .then(user => {
       user.firstName = firstName
       user.password = password
